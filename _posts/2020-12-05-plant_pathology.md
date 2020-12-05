@@ -1,13 +1,30 @@
 Competition: https://www.kaggle.com/c/plant-pathology-2020-fgvc7/overview
 
 # Problem description
+The goal of this competition is to classify plant images. There are 4 possible output:
+- healthy
+- scab
+- rust
+- multiple diseases
+
 This is an image classification problem. Each image can only have 1 label.
 The goal is to classify between healthy, scab, rust and multiply diseases.
 
 There are 1821 train images, 1821 test images. Images are quite large (2048x1365)
 
-Here are some of them from the fast.ai interpretation view:
-![some images](../images/confused.png)
+Some examples:
+## rust
+![rust1](../images/rust1.png)
+![rust2](../images/rust2.png)
+
+## scab
+![scab1](../images/scab1.png)
+![scab2](../images/scab2.png)
+
+## healthy
+![healthy](../images/healthy.png)
+
+## multiple_diseases
 
 
 # My score evolution
@@ -19,7 +36,7 @@ I mostly looked at the 1st place solution for inspiration: https://www.kaggle.co
 
 # What worked
 - seresnextnet50 as architecture
-- larger images (320x512). I used batch size 16 to manage this
+- larger images (320x512). I used batch size 16 to train on kaggle notebooks (bs=64 gives OOM)
 - 5-fold stratified cross-validation
 - augmentations (Rotate, Zoom, Warp, Brightness, Flip, Contrast, Resize, Normalize
 - TTA
