@@ -19,23 +19,23 @@ There are 1821 train images, 1821 test images. Images are quite large (2048x1365
 Some examples:
 ## rust
 ![rust1](/images/rust1.png)
-![rust2](../images/rust2.png)
+![rust2](/images/rust2.png)
 
 ## scab
-![scab1](../images/scab1.png)
-![scab2](../images/scab2.png)
+![scab1](/images/scab1.png)
+![scab2](/images/scab2.png)
 
 ## healthy
-![healthy](../images/healthy.png)
+![healthy](/images/healthy.png)
 
 ## multiple_diseases
-![healthy](../images/multi.png)
+![healthy](/images/multi.png)
 
 
 # My score evolution
 I worked 2 weeks on this competition.
 If I work 2 more weeks, I should get a perfect score ;-)
-![my scores](../images/scores.png)
+![my scores](/images/scores.png)
 
 My best score is: 0.96380 private, 0.97800 public.
 That would give me rank #406 (out of 1317). Top 33%...
@@ -56,7 +56,7 @@ I mostly looked at the 1st place solution for inspiration: https://www.kaggle.co
 # What was complicated
 - some images are mislabeled -> what to do with these? ignore? change the label?
 - some noisy labels as well (rust in the background of the healthy leaf)
-![noisy](../images/noisy.png)
+![noisy](/images/noisy.png)
 - hard to manually label data when mislabeled - especially for the 'multi-disease' category
 - ROC AUC metric on validation set is >0.999 on all folds -> hard to know what is helping before submitting
 
@@ -65,8 +65,8 @@ I mostly looked at the 1st place solution for inspiration: https://www.kaggle.co
 - use soft labels and try to apply distilation knowledge
 - use gradcam to visualize and interpret results
 
-![original](../images/orig.png)
-![rainbow](../images/rainbow.png)
+![original](/images/orig.png)
+![rainbow](/images/rainbow.png)
 
 - oversampling the under-represented class ('multiple_disease'). This seemed to help the local score but didn't translate on the leaderboard.
 
