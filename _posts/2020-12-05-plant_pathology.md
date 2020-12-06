@@ -1,8 +1,8 @@
-Competition: https://www.kaggle.com/c/plant-pathology-2020-fgvc7/overview
+This page is my write-up for the [plant pathology kaggle competition](https://www.kaggle.com/c/plant-pathology-2020-fgvc7/overview)
 
 I worked on this for 2 weeks as part of the FastChai and Kaggle: Group based Projects https://forums.fast.ai/t/fastchai-and-kaggle-group-based-projects/81384 organized by Sanyam Bhutani.
 
-I worked with Isaac Flath on this project - see his blog here: https://isaac-flath.github.io/blog
+I worked with Isaac Flath on this project - see his blog [here](https://isaac-flath.github.io/blog)
 
 # Problem description
 The goal of this competition is to classify plant images. There are 4 possible output:
@@ -42,7 +42,7 @@ That would give me rank #406 (out of 1317). Top 33%...
 
 Top 10% threshold is 0.9736	private, 1st place solution achieved 0.98445 private.
 
-I mostly looked at the 1st place solution for inspiration: https://www.kaggle.com/c/plant-pathology-2020-fgvc7/discussion/154056
+I mostly looked at the 1st place solution for inspiration [discussion on kaggle](https://www.kaggle.com/c/plant-pathology-2020-fgvc7/discussion/154056)
 
 # What worked
 - seresnextnet50 as architecture
@@ -61,7 +61,7 @@ I mostly looked at the 1st place solution for inspiration: https://www.kaggle.co
 - ROC AUC metric on validation set is >0.999 on all folds -> hard to know what is helping before submitting
 
 # What I tried
-- pseudo labeling technique to augment the dataset (see https://isaac-flath.github.io/blog/deep%20learning/2020/11/26/Pseudo-Labeling.html)
+- pseudo labeling technique to augment the dataset (see [Isaac's blog about pseudo labeling](https://isaac-flath.github.io/blog/deep%20learning/2020/11/26/Pseudo-Labeling.html))
 - use soft labels and try to apply distilation knowledge
 - use gradcam to visualize and interpret results
 
@@ -94,7 +94,7 @@ Rankdata worked better than averaging the predictions.
 
 ## Run a stratified K-fold cross-validation
 
-Full code here: https://www.kaggle.com/hamonk/plant-pathology-fastai-seresnext50
+[Full code here](https://www.kaggle.com/hamonk/plant-pathology-fastai-seresnext50)
 
 ```python
 for fold in range(0,5):
@@ -205,5 +205,5 @@ I am sure there are much better ways to do this but I was pretty happy to be abl
 
 
 # Paper to cite
-https://arxiv.org/abs/2004.11958
+[link to arxiv paper](https://arxiv.org/abs/2004.11958)
 
