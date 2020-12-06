@@ -36,6 +36,10 @@ I worked 2 weeks on this competition.
 If I work 2 more weeks, I should get a perfect score ;-)
 ![my scores](../images/scores.png)
 
+My best score is: 0.96380 private, 0.97800 public.
+That would give me rank #406 (out of 1317). Top 33%...
+Top 10% threshold is 0.9736	priate, 1st place solution achieved 0.98445 private.
+
 I mostly looked at the 1st place solution for inspiration: https://www.kaggle.com/c/plant-pathology-2020-fgvc7/discussion/154056
 
 # What worked
