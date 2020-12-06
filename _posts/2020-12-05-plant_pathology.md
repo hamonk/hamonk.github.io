@@ -18,7 +18,7 @@ There are 1821 train images, 1821 test images. Images are quite large (2048x1365
 
 Some examples:
 ## rust
-![rust1](../images/rust1.png)
+![rust1](/images/rust1.png)
 ![rust2](../images/rust2.png)
 
 ## scab
