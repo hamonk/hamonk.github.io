@@ -2,6 +2,7 @@ Competition: https://www.kaggle.com/c/plant-pathology-2020-fgvc7/overview
 
 I worked on this for 2 weeks as part of the FastChai and Kaggle: Group based Projects https://forums.fast.ai/t/fastchai-and-kaggle-group-based-projects/81384 organized by Sanyam Bhutani.
 
+I worked with Isaac Flath on this project - see his blog here: https://isaac-flath.github.io/blog
 
 # Problem description
 The goal of this competition is to classify plant images. There are 4 possible output:
@@ -38,7 +39,8 @@ If I work 2 more weeks, I should get a perfect score ;-)
 
 My best score is: 0.96380 private, 0.97800 public.
 That would give me rank #406 (out of 1317). Top 33%...
-Top 10% threshold is 0.9736	priate, 1st place solution achieved 0.98445 private.
+
+Top 10% threshold is 0.9736	private, 1st place solution achieved 0.98445 private.
 
 I mostly looked at the 1st place solution for inspiration: https://www.kaggle.com/c/plant-pathology-2020-fgvc7/discussion/154056
 
