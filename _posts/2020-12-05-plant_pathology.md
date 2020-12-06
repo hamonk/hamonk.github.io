@@ -17,12 +17,12 @@ There are 1821 train images, 1821 test images. Images are quite large (2048x1365
 
 Some examples:
 ## rust
-![rust1](../images/rust1.png)
-![rust2](../images/rust2.png)
+![rust1](../images/rust1.png=100x200)
+![rust2](../images/rust2.png=200x300)
 
 ## scab
-![scab1](../images/scab1.png)
-![scab2](../images/scab2.png)
+![scab1](../images/scab1.png=50x75)
+![scab2](../images/scab2.png=50x75)
 
 ## healthy
 ![healthy](../images/healthy.png)
@@ -57,6 +57,7 @@ I mostly looked at the 1st place solution for inspiration: https://www.kaggle.co
 - pseudo labeling technique to augment the dataset (see https://isaac-flath.github.io/blog/deep%20learning/2020/11/26/Pseudo-Labeling.html)
 - use soft labels and try to apply distilation knowledge
 - use gradcam to visualize and interpret results
+
 ![original](../images/orig.png)
 ![rainbow](../images/rainbow.png)
 
