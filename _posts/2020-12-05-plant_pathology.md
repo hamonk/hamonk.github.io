@@ -93,6 +93,9 @@ Since the metric is AUC ROC, the only thing that matters is the order of the pre
 Rankdata worked better than averaging the predictions. 
 
 ## Run a stratified K-fold cross-validation
+
+Full code here: https://www.kaggle.com/hamonk/plant-pathology-fastai-seresnext50
+
 ```python
 for fold in range(0,5):
 
