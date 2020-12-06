@@ -57,8 +57,8 @@ I mostly looked at the 1st place solution for inspiration: https://www.kaggle.co
 - pseudo labeling technique to augment the dataset (see https://isaac-flath.github.io/blog/deep%20learning/2020/11/26/Pseudo-Labeling.html)
 - use soft labels and try to apply distilation knowledge
 - use gradcam to visualize and interpret results
-[original](../images/orig.png)
-[rainbow](../images/rainbow.png)
+![original](../images/orig.png)
+![rainbow](../images/rainbow.png)
 
 - oversampling the under-represented class ('multiple_disease'). This seemed to help the local score but didn't translate on the leaderboard.
 
@@ -70,12 +70,14 @@ I mostly looked at the 1st place solution for inspiration: https://www.kaggle.co
 # Some details
 
 ## Use seresnextnet50 as architecture
-	!pip install -q pretrainedmodels
-	import pretrainedmodels
-	def model_f(pretrained=True,**kwargs):
-	    return pretrainedmodels.se_resnext50_32x4d(num_classes=1000,pretrained='imagenet')
-	learn = cnn_learner(dls, model_f, pretrained=True, 
-	                    loss_func=LabelSmoothingCrossEntropy(), metrics=[RocAuc(), error_rate])
+```python
+!pip install -q pretrainedmodels
+import pretrainedmodels
+def model_f(pretrained=True,**kwargs):
+    return pretrainedmodels.se_resnext50_32x4d(num_classes=1000,pretrained='imagenet')
+learn = cnn_learner(dls, model_f, pretrained=True, 
+                    loss_func=LabelSmoothingCrossEntropy(), metrics=[RocAuc(), error_rate])
+```
 
 ## Use rankdata to blend the fold submissions
 When running the cross validation, you generate predict for each fold.
