@@ -17,17 +17,18 @@ There are 1821 train images, 1821 test images. Images are quite large (2048x1365
 
 Some examples:
 ## rust
-![rust1](../images/rust1.png=100x200)
-![rust2](../images/rust2.png=200x300)
+![rust1](../images/rust1.png)
+![rust2](../images/rust2.png)
 
 ## scab
-![scab1](../images/scab1.png=50x75)
-![scab2](../images/scab2.png=50x75)
+![scab1](../images/scab1.png)
+![scab2](../images/scab2.png)
 
 ## healthy
 ![healthy](../images/healthy.png)
 
 ## multiple_diseases
+![healthy](../images/multi.png)
 
 
 # My score evolution
