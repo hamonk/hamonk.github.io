@@ -18,15 +18,13 @@ There are 1821 train images, 1821 test images. Images are quite large (2048x1365
 
 Some examples:
 ## rust
-![rust1](/images/rust1.png)
-![rust2](/images/rust2.png)
+![rust1](/images/rust1.png) ![rust2](/images/rust2.png)
 
 ## scab
-![scab1](/images/scab1.png)
-![scab2](/images/scab2.png)
+![scab1](/images/scab1.png) ![scab2](/images/scab2.png)
 
 ## healthy
-![healthy](/images/healthy.png)
+![healthy](/images/healthy.png) 
 
 ## multiple_diseases
 ![healthy](/images/multi.png)
@@ -51,11 +49,20 @@ I mostly looked at the 1st place solution for inspiration [discussion on kaggle]
 # What worked
 - seresnextnet50 as architecture
 - larger images (320x512). I used batch size 16 to train on kaggle notebooks (bs=64 gives OOM)
-- 5-fold stratified cross-validation
+- 5-fold stratified cross-validation. It clearly helps because when I submit the 5 scores from the folds, they perform worse.
 - augmentations (Rotate, Zoom, Warp, Brightness, Flip, Contrast, Resize, Normalize
 - TTA
 - LabelSmoothingCrossEntropy loss function
 - generate 5 predictions from the 5-fold cross-validation and use rankdata to blend the submissions
+- I adapted a notebook to detect duplicate images. See my version [here](https://www.kaggle.com/hamonk/let-s-find-out-duplicate-images-with-imagehash)
+Forked from Appian notebook [here](https://www.kaggle.com/appian/let-s-find-out-duplicate-images-with-imagehash)
+
+This helped me see that many images were duplicated (either both images were in the training set or test set or 1 image in train and the other one in test).
+What was disappointing is that for images present in train and test datasets, I used the train label to change my predictions... and that made my score worse... So it means that the labels are not necessarily consistent...
+There's actually 1 duplicated image in the training with 2 different labels...
+![dup](/images/dup.png)
+
+Also based on this notebook, I removed duplicated images in the train set.
 
 # What was complicated
 - some images are mislabeled -> what to do with these? ignore? change the label?
@@ -68,9 +75,10 @@ I mostly looked at the 1st place solution for inspiration [discussion on kaggle]
 - pseudo labeling technique to augment the dataset (see [Isaac's blog about pseudo labeling](https://isaac-flath.github.io/blog/deep%20learning/2020/11/26/Pseudo-Labeling.html))
 - use soft labels and try to apply distilation knowledge
 - use gradcam to visualize and interpret results
+- use bigger images. I saved the models trained with images 320x512 and used the models to train 500x750 images. For that, I had to decrease again the batch size (bs=8) to avoid out of memory.
+It didn't help much.
 
-![original](/images/orig.png)
-![rainbow](/images/rainbow.png)
+![original](/images/orig.png) ![rainbow](/images/rainbow.png)
 
 - oversampling the under-represented class ('multiple_disease'). This seemed to help the local score but didn't translate on the leaderboard.
 
