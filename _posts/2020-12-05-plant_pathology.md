@@ -33,10 +33,14 @@ Some examples:
 
 
 # My score evolution
-I worked 2 weeks on this competition.
-If I work 2 more weeks, I should get a perfect score ;-)
-![my scores](/images/scores.png)
+I worked 2 * 2 weeks on this competition.
 
+![my scores](/images/my_private.png)
+
+Final best score:
+0.9722 private. That would give me rank #206 (out of 1317). Top 15%...
+
+Frist 2 weeks:
 My best score is: 0.96380 private, 0.97800 public.
 That would give me rank #406 (out of 1317). Top 33%...
 
