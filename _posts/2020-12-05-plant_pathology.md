@@ -23,6 +23,8 @@ The category 'multiple diseases' is largely under-represented.
 There are 1821 train images, 1821 test images. Images are quite large (2048x1365)
 
 Some examples:
+
+
 | class | example |
 |-------|---------|
 | rust     | ![rust1](/images/rust1.png)
