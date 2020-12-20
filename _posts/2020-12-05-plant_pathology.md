@@ -6,10 +6,12 @@
 # Context
 This page is my write-up for the [plant pathology kaggle competition](https://www.kaggle.com/c/plant-pathology-2020-fgvc7/overview)
 
-I worked on this for 2 weeks as part of the FastChai and Kaggle: [Group based Projects](https://forums.fast.ai/t/fastchai-and-kaggle-group-based-projects/81384) organized by Sanyam Bhutani.
-Each sprint, small groups work on past kaggle competitions. 
+I worked on this for 4 weeks as part of the FastChai and Kaggle: [Group based Projects](https://forums.fast.ai/t/fastchai-and-kaggle-group-based-projects/81384) organized by Sanyam Bhutani.
+Each sprint (each sprint is 2 weeks long), small groups work on past kaggle competitions. 
 
 For this one, I worked 2 sprints and reached top 12%. I'm happy with the result!
+
+To be short, here's what worked well for me: 5-fold training, pseudo-labelling augmentation, se-resnext50 pretrained models, 320x512 images, TTA, augmentation (rotate, zoom, flip, contrast, brightness), LabelSmoothingCrossEntropy loss function, managing duplicates.
 
 I worked with Isaac Flath on this project - see his blog [here](https://isaac-flath.github.io/blog)
 
@@ -23,12 +25,14 @@ The category 'multiple diseases' is largely under-represented.
 There are 1821 train images, 1821 test images. Images are quite large (2048x1365)
 
 Some examples:
+
+
 | class | example |
 |-------|---------|
-| rust     | ![rust1](/images/rust1.png) ![rust2](/images/rust2.png)   |
-| scab     | ![scab1](/images/scab1.png) ![scab2](/images/scab2.png)  |
-| healthy     | ![healthy](/images/healthy.png)   |
-| multiple_diseases     | ![healthy](/images/multi.png)  |
+| rust     | ![rust1](/images/rust1.png) ![rust2](/images/rust2.png)
+| scab     | ![scab1](/images/scab1.png) ![scab2](/images/scab2.png)
+| healthy     | ![healthy](/images/healthy.png)
+| multiple_diseases     | ![healthy](/images/multi.png)
 
 
 # My score evolution
@@ -74,7 +78,7 @@ Also based on this notebook, I removed duplicated images in the train set.
 - hard to manually label data when mislabeled - especially for the 'multi-disease' category
 - ROC AUC metric on validation set is >0.999 on all folds -> hard to know what is helping before submitting
 
-# What I tried
+# Other things I tried
 - use soft labels and try to apply distilation knowledge
 - use gradcam to visualize and interpret results
 - use bigger images. I saved the models trained with images 320x512 and used the models to train 500x750 images. For that, I had to decrease again the batch size (bs=8) to avoid out of memory.
