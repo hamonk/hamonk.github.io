@@ -36,7 +36,7 @@ I worked 2 * 2 weeks on this competition.
 ![my scores](/images/my_private.png)
 
 Final best score:
-0.9722 private. That would give me rank #206 (out of 1317). Top 15%...
+0.9786 private. That would give me rank #160 (out of 1317). Top 12%...
 
 Frist 2 weeks:
 My best score is: 0.96380 private, 0.97800 public.
@@ -50,6 +50,7 @@ I mostly looked at the 1st place solution for inspiration [discussion on kaggle]
 - seresnextnet50 as architecture
 - larger images (320x512). I used batch size 16 to train on kaggle notebooks (bs=64 gives OOM)
 - 5-fold stratified cross-validation. It clearly helps because when I submit the 5 scores from the folds, they perform worse.
+- Instead of using the 5 folds, I used the best 4 (according to public LB score) and it gave me a bump of 0.00064 points. It sounds like nothing but that improved my rank by 40 positions from 200 to 160.
 - augmentations (Rotate, Zoom, Warp, Brightness, Flip, Contrast, Resize, Normalize
 - TTA
 - LabelSmoothingCrossEntropy loss function
@@ -103,6 +104,18 @@ learn = cnn_learner(dls, model_f, pretrained=True,
 When running the cross validation, you generate predict for each fold.
 Since the metric is AUC ROC, the only thing that matters is the order of the predictions.
 Rankdata worked better than averaging the predictions. 
+
+An idea I got at the end was to ignore the worst prediction from my blending.
+It paid off because my score went from .97220 to .97286
+
+Here are my fold scores:
+| Fold        | My CV ROC AUC | My CV ROC AUC (multiple diseases) | Private score | Public score |
+| ----------- | ----------- | ----------- | ----------- | 
+| 0   | .9835  |   .94660      | .97062 | .96879 |
+| 1   | .98645 |   .96257     | .9633 | .96487 |
+| 2   | .98934 |   .96798     | .96172 | .96011 | (worst public)
+| 3   | .99286  |  .9780     | .96414 |.97340 |
+| 4   | .98576  |  .96202     | .96855 |.97126 |
 
 ## Run a stratified K-fold cross-validation
 
