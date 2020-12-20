@@ -1,3 +1,9 @@
+# Kaggle plant pathology write-up
+
+1. TOC
+{:toc}
+
+# Context
 This page is my write-up for the [plant pathology kaggle competition](https://www.kaggle.com/c/plant-pathology-2020-fgvc7/overview)
 
 I worked on this for 2 weeks as part of the FastChai and Kaggle: [Group based Projects](https://forums.fast.ai/t/fastchai-and-kaggle-group-based-projects/81384) organized by Sanyam Bhutani.
