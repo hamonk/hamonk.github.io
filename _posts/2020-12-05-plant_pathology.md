@@ -14,11 +14,8 @@ For this one, I worked 2 sprints and reached top 12%. I'm happy with the result!
 I worked with Isaac Flath on this project - see his blog [here](https://isaac-flath.github.io/blog)
 
 # Problem description
-The goal of this competition is to classify plant images. There are 4 possible output:
-- healthy
-- scab
-- rust
-- multiple diseases
+The goal of this competition is to classify plant images. 
+There are 4 possible output: healthy, scab , rust and multiple diseases
 
 This is an image classification problem. Each image can only have 1 label.
 The category 'multiple diseases' is largely under-represented.
@@ -26,17 +23,12 @@ The category 'multiple diseases' is largely under-represented.
 There are 1821 train images, 1821 test images. Images are quite large (2048x1365)
 
 Some examples:
-## rust
-![rust1](/images/rust1.png) ![rust2](/images/rust2.png)
-
-## scab
-![scab1](/images/scab1.png) ![scab2](/images/scab2.png)
-
-## healthy
-![healthy](/images/healthy.png) 
-
-## multiple_diseases
-![healthy](/images/multi.png)
+| class | example |
+|-------|---------|
+| rust     | ![rust1](/images/rust1.png) ![rust2](/images/rust2.png)   |
+| scab     | ![scab1](/images/scab1.png) ![scab2](/images/scab2.png)  |
+| healthy     | ![healthy](/images/healthy.png)   |
+| multiple_diseases     | ![healthy](/images/multi.png)  |
 
 
 # My score evolution
@@ -63,6 +55,7 @@ I mostly looked at the 1st place solution for inspiration [discussion on kaggle]
 - augmentations (Rotate, Zoom, Warp, Brightness, Flip, Contrast, Resize, Normalize
 - TTA
 - LabelSmoothingCrossEntropy loss function
+- pseudo labeling technique to augment the dataset (see [Isaac's blog about pseudo labeling](https://isaac-flath.github.io/blog/deep%20learning/2020/11/26/Pseudo-Labeling.html))
 - generate 5 predictions from the 5-fold cross-validation and use rankdata to blend the submissions
 - I adapted a notebook to detect duplicate images. See my version [here](https://www.kaggle.com/hamonk/let-s-find-out-duplicate-images-with-imagehash)
 Forked from Appian notebook [here](https://www.kaggle.com/appian/let-s-find-out-duplicate-images-with-imagehash)
@@ -82,7 +75,6 @@ Also based on this notebook, I removed duplicated images in the train set.
 - ROC AUC metric on validation set is >0.999 on all folds -> hard to know what is helping before submitting
 
 # What I tried
-- pseudo labeling technique to augment the dataset (see [Isaac's blog about pseudo labeling](https://isaac-flath.github.io/blog/deep%20learning/2020/11/26/Pseudo-Labeling.html))
 - use soft labels and try to apply distilation knowledge
 - use gradcam to visualize and interpret results
 - use bigger images. I saved the models trained with images 320x512 and used the models to train 500x750 images. For that, I had to decrease again the batch size (bs=8) to avoid out of memory.
@@ -95,7 +87,6 @@ It didn't help much.
 # How I worked
 - Kaggle kernels
 - 5-fold cross validation in 1 notebook
-- merge prediction in separate notebook (cross-validation output is saved as a new dataset)
 
 # Some details
 
@@ -110,12 +101,12 @@ learn = cnn_learner(dls, model_f, pretrained=True,
 ```
 
 ## Use rankdata to blend the fold submissions
-When running the cross validation, you generate predict for each fold.
+When running the cross validation, you generate a prediction of the test set for each fold.
 Since the metric is AUC ROC, the only thing that matters is the order of the predictions.
 Rankdata worked better than averaging the predictions. 
 
 An idea I got at the end was to ignore the worst prediction from my blending.
-It paid off because my score went from .97220 to .97286
+It paid off because my score went from .97220 to .97286 (looks small but that going from #200 to #160)
 
 Here are my fold scores:
 
@@ -126,6 +117,9 @@ Here are my fold scores:
 | 2    | .98934        | .96798                            | .96172        | .96011       |
 | 3    | .99286        | .9780                             | .96414        | .97340       |
 | 4    | .98576        | .96202                            | .96855        | .97126       |
+
+Ignoring the fold # 2 helped!
+
 
 ## Run a stratified K-fold cross-validation
 
