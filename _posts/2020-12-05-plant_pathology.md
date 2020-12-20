@@ -25,8 +25,10 @@ There are 1821 train images, 1821 test images. Images are quite large (2048x1365
 Some examples:
 | class | example |
 |-------|---------|
-| rust     | ![rust1](/images/rust1.png) ![rust2](/images/rust2.png)   |
-| scab     | ![scab1](/images/scab1.png) ![scab2](/images/scab2.png)  |
+| rust     | ![rust1](/images/rust1.png) |
+| rust     | ![rust2](/images/rust2.png) |
+| scab     | ![scab1](/images/scab1.png) |
+| scab     | ![scab2](/images/scab2.png) |
 | healthy     | ![healthy](/images/healthy.png)   |
 | multiple_diseases     | ![healthy](/images/multi.png)  |
 
