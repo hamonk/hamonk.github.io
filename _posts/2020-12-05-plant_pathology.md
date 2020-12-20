@@ -1,7 +1,9 @@
 This page is my write-up for the [plant pathology kaggle competition](https://www.kaggle.com/c/plant-pathology-2020-fgvc7/overview)
 
-I worked on this for 2 weeks as part of the FastChai and Kaggle: Group based Projects https://forums.fast.ai/t/fastchai-and-kaggle-group-based-projects/81384 organized by Sanyam Bhutani.
-The goal is to reach the top 10%. I am almost there, I am in the top 12% after 2 sprints!
+I worked on this for 2 weeks as part of the FastChai and Kaggle: [Group based Projects](https://forums.fast.ai/t/fastchai-and-kaggle-group-based-projects/81384) organized by Sanyam Bhutani.
+Each sprint, small groups work on past kaggle competitions. 
+
+For this one, I worked 2 sprints and reached top 12%. I'm happy with the result!
 
 I worked with Isaac Flath on this project - see his blog [here](https://isaac-flath.github.io/blog)
 
