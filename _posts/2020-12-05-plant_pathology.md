@@ -33,7 +33,7 @@ Some examples:
 # My score evolution
 I worked 2 * 2 weeks on this competition.
 
-![my scores](/images/my_private.png)
+![my scores](/images/my_scores.png)
 
 Final best score:
 0.9786 private. That would give me rank #160 (out of 1317). Top 12%...
