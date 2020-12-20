@@ -11,6 +11,8 @@ Each sprint, small groups work on past kaggle competitions.
 
 For this one, I worked 2 sprints and reached top 12%. I'm happy with the result!
 
+To be short, here's what worked well for me: 5-fold training, pseudo-labelling augmentation, se-resnext50 pretrained models, 320x512 images, TTA, augmentation (rotate, zoom, flip, contrast, brightness), LabelSmoothingCrossEntropy loss function, managing duplicates.
+
 I worked with Isaac Flath on this project - see his blog [here](https://isaac-flath.github.io/blog)
 
 # Problem description
