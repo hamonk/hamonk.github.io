@@ -109,12 +109,13 @@ An idea I got at the end was to ignore the worst prediction from my blending.
 It paid off because my score went from .97220 to .97286
 
 Here are my fold scores:
+
 | ----------- | ----------- | ----------- | ----------- | ----------- | 
 | Fold        | My CV ROC AUC | My CV ROC AUC (multiple diseases) | Private score | Public score |
-| ----------- | ----------- | ----------- | ----------- | 
+| ----------- | ----------- | ----------- | ----------- | ----------- | 
 | 0   | .9835  |   .94660      | .97062 | .96879 |
 | 1   | .98645 |   .96257     | .9633 | .96487 |
-| 2   | .98934 |   .96798     | .96172 | .96011 | (worst public)
+| 2   | .98934 |   .96798     | .96172 | .96011 |
 | 3   | .99286  |  .9780     | .96414 |.97340 |
 | 4   | .98576  |  .96202     | .96855 |.97126 |
 
