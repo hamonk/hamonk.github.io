@@ -33,6 +33,15 @@ Some examples:
 | multiple_diseases     | ![healthy](/images/multi.png)  |
 
 
+| class | example |
+|-------|---------|
+| rust     |  |
+| rust     |  |
+| scab     |  |
+| scab     |  |
+| healthy     |    |
+| multiple_diseases     |   |
+
 # My score evolution
 I worked 2 * 2 weeks on this competition.
 
