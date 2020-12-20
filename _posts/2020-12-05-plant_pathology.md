@@ -25,22 +25,13 @@ There are 1821 train images, 1821 test images. Images are quite large (2048x1365
 Some examples:
 | class | example |
 |-------|---------|
-| rust     | ![rust1](/images/rust1.png) |
-| rust     | ![rust2](/images/rust2.png) |
-| scab     | ![scab1](/images/scab1.png) |
-| scab     | ![scab2](/images/scab2.png) |
-| healthy     | ![healthy](/images/healthy.png)   |
-| multiple_diseases     | ![healthy](/images/multi.png)  |
+| rust     | ![rust1](/images/rust1.png)
+| rust     | ![rust2](/images/rust2.png)
+| scab     | ![scab1](/images/scab1.png)
+| scab     | ![scab2](/images/scab2.png)
+| healthy     | ![healthy](/images/healthy.png)
+| multiple_diseases     | ![healthy](/images/multi.png)
 
-
-| class | example |
-|-------|---------|
-| rust     |  |
-| rust     |  |
-| scab     |  |
-| scab     |  |
-| healthy     |    |
-| multiple_diseases     |   |
 
 # My score evolution
 I worked 2 * 2 weeks on this competition.
