@@ -59,7 +59,7 @@ Thanks to the grey crosses on the plot, we can see that the entire input space i
 
 ## Orthogonal Initialization
 
-I experimented with initialization methods. Xavier didn’t help much.
+I experimented with initialization methods. Xavier didn’t help much. (see [Glorot Initialization](https://en.wikipedia.org/wiki/Weight_initialization#Glorot_initialization))
 
 The breakthrough came with orthogonal initialization. As soon as I applied it, the network became much more reliable and reached 100% accuracy consistently.
 
