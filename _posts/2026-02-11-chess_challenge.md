@@ -1,4 +1,4 @@
-# Can a Bee-Sized Brain Play Chess? Training a <1M Parameter Chess Engine
+# Can a Bee-Sized Brain Play Chess? Training a 1M Parameter Chess Engine
 
 *An investigation into how a honey bee-sized neural network learns to play chess through next-token prediction*
 
@@ -164,7 +164,7 @@ I analyzed performance by game length:
 
 **Insight**: No significant degradation in late game! The model maintains consistency even with longer contexts.
 
-![Distribution of Retries](images/chess/distribution_of_retries.png)
+![Distribution of Retries](/images/chess/distribution_of_retries.png)
 
 *Figure: Distribution of retries needed for legal moves across 500 test positions*
 
@@ -205,7 +205,7 @@ def get_token_probs_at_positions(board, moves_str, num_tokens=5):
 - **Token 4** (from square): Varies based on piece chosen
 - **Token 5** (to square): Varies based on position and tactics
 
-![Model Confidence vs Context Length](images/chess/model_confidence.png)
+![Model Confidence vs Context Length](/images/chess/model_confidence.png)
 
 *Figure: Model's confidence on piece type prediction (Token 3) remains stable across different game lengths*
 
@@ -317,7 +317,7 @@ Result: Predicted 'B' - Model flipped the color this time
 
 **Position**: After `WNg1h3 BPd7d6 WPf2f3 BBc8g4 WRh1g1 BPh7h5 WRg1h1 BPa7a6 WPd2d4 BNg8h6 WPd4d5 BBg4f5`, White to play
 
-![Successful Bishop Development](images/chess/c2c4.png)
+![Successful Bishop Development](/images/chess/c2c4.png)
 
 *Figure: Model successfully predicts Bishop development (green arrow)*
 
@@ -334,7 +334,7 @@ Retries needed: 0
 
 **Position**: Complex middlegame after 18 moves
 
-![Failed First Attempt](images/chess/missed_check.png)
+![Failed First Attempt](/images/chess/missed_check.png)
 
 *Figure: Red arrow shows illegal first attempt, green arrow shows successful retry*
 
@@ -354,19 +354,19 @@ Can the model spot checkmate in one move?
 
 I tested the model on classic mate-in-1 positions:
 
-![Missed Mate Position](images/chess/missed_mate_1.png)
+![Missed Mate Position](/images/chess/missed_mate_1.png)
 
 Missed WQf7+*
 
-![Missed Mate Position](images/chess/missed_mate_2.png)
+![Missed Mate Position](/images/chess/missed_mate_2.png)
 
 Missed BQhj4+*
 
-![Missed Mate Position](images/chess/missed_mate_3.png)
+![Missed Mate Position](/images/chess/missed_mate_3.png)
 
 Missed WRd8+*
 
-![Missed Mate Position](images/chess/missed_mate_4.png)
+![Missed Mate Position](/images/chess/missed_mate_4.png)
 
 Missed BQh1+*
 
@@ -396,7 +396,7 @@ c2c4   8%  ← English Opening
 e2e3   6%  ← Other
 ```
 
-![White's Opening Repertoire](images/chess/white_openings.png)
+![White's Opening Repertoire](/images/chess/white_openings.png)
 
 *Figure: Top 5 first moves for White, shown as colored arrows on the starting position*
 
@@ -412,7 +412,7 @@ c7c6   5%  ← Caro-Kann Defense
 d7d5   3%  ← Scandinavian Defense
 ```
 
-![Black's Response to e4](images/chess/black_answer_e2e4.png)
+![Black's Response to e4](/images/chess/black_answer_e2e4.png)
 
 *Figure: Black's most common responses to 1.e4, with White's first move shown in gray*
 
@@ -428,19 +428,19 @@ Before discussing the theoretical limitations, let's see some actual examples of
 
 #### Example 1: Trying to Jump Over Pawns
 
-![Illegal knight move](images/chess/jump_over_pawn.png)
+![Illegal knight move](/images/chess/jump_over_pawn.png)
 
 *The model sometimes forgets knights are the only pieces that can jump over others*
 
 #### Example 2: Moving Pawns Backwards
 
-![Illegal pawn move](images/chess/straight_pawn.png)  
+![Illegal pawn move](/images/chess/straight_pawn.png)  
 
 *Pawns can only move forward - but the model occasionally tries backward moves*
 
 #### Example 3: Missing Opponent Checks
 
-![Missed check](images/chess/missed_check.png)
+![Missed check](/images/chess/missed_check.png)
 
 *The model doesn't always track which squares are under attack*
 
