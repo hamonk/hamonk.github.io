@@ -2,22 +2,25 @@
 
 *An investigation into how a honey bee-sized neural network learns to play chess through next-token prediction*
 
+1. TOC
+{:toc}
+
 ---
 
 ## TL;DR
 
-I trained a **900K parameter transformer** to play chess using only next-token prediction - no explicit rules, no search algorithms, just pattern recognition. The model achieves an **85.9% legal move rate** on first try, rising to **99.0%** with retries. Through deep analysis, I discovered:
+I trained a **900K parameter transformer** to play chess using only next-token prediction - no explicit rules, no search algorithms, just pattern recognition. The model achieves an **85.9% legal move rate** on first try, rising to **99.0%** with retries. Here are some of the parts I explore in detail in this write-up:
 
-- The model composes moves from **5 tokens** (separator + color + piece type + from_square + to_square)
+- By training to predict the next token (actually 5 tokens per move: separator + color + piece type + from_square + to_square), the model achieves excellent legal move rates. One of the things I love about machine learning is how the training phase lets you ingest massive amounts of data, and complex rules emerge naturally from the patterns!
 - **Token 3 (piece type)** is where real chess decisions happen (~57% confidence)
 - The model uses **shortcut learning** for simple patterns (e.g., alternating colors)
 - It excels at pattern matching but struggles with deep tactical calculations
 
-This post documents the nitty-gritty details of what the model learned and where it falls short.
+This post documents the details of what the model learned and where it falls short.
 
 ---
 
-## 1. The Challenge: Chess as a Language Problem
+## The Challenge: Chess as a Language Problem
 
 **Context**: This project was part of the [2026 LLM Course](https://llm.labri.fr/) taught by Nathanaël Fijalkow and Marc Lelarge.
 Thank you for this fun project!
@@ -35,11 +38,11 @@ Input:  [BOS] WPe2e4 BPe7e5 WNg1f3 ...
 Output: BNb8c6  ← model predicts next move
 ```
 
-Each move is encoded as character-level tokens: `WPe2e4` = White Pawn from e2 to e4. The model learns by predicting the next token, just like GPT learns to predict the next word.
+Each move is encoded this way: `WPe2e4` = White Pawn from e2 to e4. The model learns by predicting the next token, just like GPT learns to predict the next word.
 
 ---
 
-## 2. Model Architecture: A Minimal GPT
+## Model Architecture: A Minimal GPT
 
 ### The Final Configuration
 
@@ -94,9 +97,11 @@ I designed a **custom tokenizer** specifically for chess moves with a vocabulary
 
 This tokenization makes each move exactly **5 tokens**: separator → color → piece → from_square → to_square. The compact vocabulary keeps the embedding layer small while making moves semantically structured.
 
+Using the full move as a single token is another option that would have made investigating the model's predictions much easier. However, the vocabulary can't feasibly represent every possible chess move. While using only the most frequent moves is an option, it would fail to represent many valid games.
+
 ---
 
-## 3. Training Setup
+## Training Setup
 
 ### Dataset: 1M Lichess Games by David Louapre
 
@@ -108,7 +113,6 @@ dataset: dlouapre/lichess_2025-01_1M
 format:  WPe2e4 BPe7e5 WNg1f3 BNb8c6 WFc4 ...
 split:   1,000,000 games
 ```
-
 
 
 Each game is one long sequence of space-separated moves. The model learns by predicting each token given all previous tokens (causal language modeling).
@@ -131,7 +135,7 @@ python -m src.train \
 
 ---
 
-## 4. Evaluation: How Well Does It Play?
+## Evaluation: How Well Does It Play?
 
 ### Legal Move Generation: 85.9% First-Try Success
 
@@ -152,25 +156,15 @@ Always illegal:       5 (1.0%)
 
 **Key Finding**: The model is remarkably good at generating legal moves! With a simple retry mechanism (sample 3 times), it achieves 99% success.
 
-### Consistency Across Game Phases
-
-I analyzed performance by game length:
-
-| Game Phase | Moves | Success Rate | Positions |
-|------------|-------|--------------|-----------|
-| Early game | ≤15   | 85.2%       | 189       |
-| Mid game   | 16-30 | 86.8%       | 201       |
-| Late game  | >30   | 85.7%       | 110       |
-
-**Insight**: No significant degradation in late game! The model maintains consistency even with longer contexts.
+The left panel below shows the distribution of retries needed across all test positions. The right panel reveals an interesting pattern: as games progress, the model requires more attempts to generate legal moves, suggesting increased difficulty with longer game contexts.
 
 ![Distribution of Retries](/images/chess/distribution_of_retries.png)
 
-*Figure: Distribution of retries needed for legal moves across 500 test positions*
+*Figure: Distribution of retries needed and Success Rate vs Game Length*
 
 ---
 
-## 5. Deep Dive: Multi-Token Move Architecture
+## Deep Dive: Multi-Token Move Architecture
 
 ### Moves Are Composed of 5 Tokens
 
@@ -237,7 +231,7 @@ The model has learned that in the opening, **pawns and knights** are most likely
 
 ---
 
-## 6. The Color Token Mystery: Shortcut Learning
+## The Color Token Mystery: Shortcut Learning
 
 ### 100% Accuracy on Predicting Color  
 
@@ -304,14 +298,14 @@ Result: Predicted 'W' - Model seems unbothered by the corruption
 #    1. 'B' 100.00% ✓✓✓
 #    2. 'W'  0.00% 
 
-Result: Predicted 'B' - Model flipped the color this time
+Result: Predicted 'B' - Model seems unbothered by the corruption
 ```
 
-**Conclusion**: This would require a deeper dive into the model to really understand what is happening.
+**Conclusion**: In both adversarial cases, the model correctly predicted the right color to play. My hypothesis is that the model learns to play White on odd turns (1, 3, 5, ...) and Black on even turns (2, 4, 6, ...). This behavior would require deeper investigation.
 
 ---
 
-## 7. Visualization: Seeing What the Model Sees
+## Visualization: Seeing What the Model Sees
 
 ### Example 1: Successful First-Try Move
 
@@ -348,34 +342,25 @@ Analysis: Model missed the check position
 
 ---
 
-## 8. Tactical Awareness: Mate-in-1 Tests
+## Tactical Awareness: Mate-in-1 Tests
 
-Can the model spot checkmate in one move?
+I tested the model on classic mate-in-1 positions.
 
-I tested the model on classic mate-in-1 positions:
+**Challenge: Can you spot the checkmate in one move?** 🤔 
+
+The green arrow shows the model's move (spoiler: none of them are correct!).
 
 ![Missed Mate Position](/images/chess/missed_mate_1.png)
-
-Missed WQf7+*
-
 ![Missed Mate Position](/images/chess/missed_mate_2.png)
-
-Missed BQhj4+*
-
 ![Missed Mate Position](/images/chess/missed_mate_3.png)
-
-Missed WRd8+*
-
 ![Missed Mate Position](/images/chess/missed_mate_4.png)
-
-Missed BQh1+*
 
 
 **Insight**: The model missed these mate-in-1 situations. Training was not goal oriented so this was expected.
 
 ---
 
-## 9. Opening Repertoire Analysis
+## Opening Repertoire Analysis
 
 ### White's First Move (100 trials)
 
@@ -420,7 +405,7 @@ d7d5   3%  ← Scandinavian Defense
 
 ---
 
-## 10. Where the Model Fails: Limitations
+## Where the Model Fails: Limitations
 
 ### Common Failure Modes
 
@@ -448,30 +433,21 @@ These real examples show the model's pattern-matching approach breaks down when 
 
 ---
 
-### 1. No Deep Calculation
+### No Deep Calculation
 
 The model can't think ahead. It predicts the next token based on patterns, not by searching future positions. This means:
 - ❌ Can't reliably find forced mates beyond simple patterns
 - ❌ Misses long tactical sequences
 - ❌ No understanding of threats or defensive moves
 
-### 2. Limited Board State Tracking
+### Limited Board State Tracking
 
 With 256 token context and ~900K parameters, the model has limited "memory":
 - ❌ May forget piece positions in complex games
 - ❌ Struggles with rare piece configurations
 - ❌ Better at openings (memorized) than endgames (novel)
 
-### 3. Shortcut Learning
-
-The model finds simple heuristics when possible:
-- ✓ Color prediction: Just flip the last color (100% accuracy, 0% understanding)
-- ✓ Piece frequency: Pawns and knights move more than queens
-- ✓ Opening patterns: Memorize popular sequences
-
-This is efficient but limits generalization to novel positions.
-
-### 4. No Strategic Understanding
+### No Strategic Understanding
 
 The model generates legal moves but doesn't understand:
 - Position evaluation (is this move good or bad?)
@@ -482,16 +458,16 @@ It's pattern matching, not "thinking" about chess.
 
 ---
 
-## 11. Key Takeaways: What Did We Learn?
+## Key Takeaways: What Did We Learn?
 
-### 1. Language Modeling Principles Work for Games
+### Language Modeling Principles Work for Games
 
 Next-token prediction naturally captures sequential game logic:
 - ✓ The model learned chess rules implicitly from data
 - ✓ No explicit rule engine needed
 - ✓ Attention mechanism handles move dependencies
 
-### 2. Small Models Can Be Surprisingly Capable
+### Small Models Can Be Surprisingly Capable
 
 With <1M parameters (honey bee-sized brain):
 - ✓ 85.9% legal move accuracy
@@ -499,7 +475,7 @@ With <1M parameters (honey bee-sized brain):
 
 This suggests **efficient compression of chess knowledge is possible**.
 
-### 3. Multi-Token Architecture Provides Interpretability
+### Multi-Token Architecture Provides Interpretability
 
 Breaking moves into 4-5 tokens reveals:
 - **Where decisions happen**: Token 3 (piece type)
@@ -508,7 +484,7 @@ Breaking moves into 4-5 tokens reveals:
 
 We can **see the model's thought process** at each token!
 
-### 4. Pattern Recognition ≠ Understanding
+### Pattern Recognition ≠ Understanding
 
 High legal move rate ≠ good chess play:
 - Model excels at learned patterns
@@ -519,34 +495,34 @@ This is the difference between **System 1 (fast, intuitive)** and **System 2 (sl
 
 ---
 
-## 12. Future Directions
+## Future Directions
 
 ### Immediate Improvements
 
-**1. Scale Up**
+**Scale Up**
 
-**2. Curriculum Learning**
+**Curriculum Learning**
 - Start with simple puzzles (mate-in-1)
 - Gradually increase difficulty
 - Fine-tune on tactical pattern datasets
 
-**3. Hybrid Approaches**
+**Hybrid Approaches**
 - Combine LM generation with shallow search (depth 1-2)
 - Use model probabilities to guide MCTS
 - Best of both worlds: pattern recognition + calculation
 
 ### Research Questions
 
-**1. Scaling Laws for Chess**
+**Scaling Laws for Chess**
 - 10M parameters → 2000 ELO?
 - What's the minimal architecture for 90%+ legal rate?
 
-**2. Comparison to Value-Function Approaches**
+**Comparison to Value-Function Approaches**
 - AlphaZero style: value network + search
 - Pure LM approach: next-token prediction
 - Which is more parameter-efficient?
 
-**3. Transfer Learning**
+**Transfer Learning**
 - Pre-train on chess puzzles
 - Fine-tune on full games
 - Does tactical training improve strategic play?
@@ -562,7 +538,7 @@ The notebook contains all the analysis from this post: token probability analysi
 
 ---
 
-## 14. Conclusion: Can a Bee Play Chess?
+## Conclusion: Can a Bee Play Chess?
 
 **Yes** - if by "play chess" you mean "generate legal moves 86% of the time."
 
