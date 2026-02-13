@@ -1,29 +1,39 @@
-# Loss function for classification
+# Loss Functions for Classification
 
-These are my notes from [Module 3 - Loss functions for classification](https://dataflowr.github.io/website/modules/3-loss-functions-for-classification/)
+1. TOC
+{:toc}
 
-I also added some hand crafted examples to better understand some of the concepts.
+## Introduction
 
-## gradient descent
-- batch gradient descent -> full training set
-- stochastic gradient descent -> 1 example at a time
-- mini batch gradient descent -> subset (=batch) of training set
+Loss functions are fundamental to machine learning and deep learning, yet their specifics can be easy to forget. This page serves as a comprehensive reference for understanding and implementing classification loss functions.
 
-## optimization problem
-The likelihood is the probability of y knowing x (training data).
-Under the assumption we have a gaussian distributed error, we can estimate the likelihood.
-When training, we often maximize the likelihood (make the observed data as probable as possible under the model).
-Likelihood is a product - complex to maximize. Taking the log helps and we just have the cost function is the sum of  square errors (ordinary least square problem).
+These notes are based on [Module 3 - Loss functions for classification](https://dataflowr.github.io/website/modules/3-loss-functions-for-classification/), enhanced with hand-crafted examples and practical PyTorch implementations to illustrate key concepts and edge cases.
 
-## logistic regression
-### binary classification
-sigmoid function:
+## Gradient Descent Variants
+
+There are three main variants of gradient descent:
+
+- **Batch Gradient Descent**: Uses the full training set for each update
+- **Stochastic Gradient Descent (SGD)**: Updates parameters using one example at a time
+- **Mini-batch Gradient Descent**: Uses a subset (batch) of the training set for each update
+
+## Optimization Problem
+
+The **likelihood** is the probability of observing $y$ given $x$ (training data). Under the assumption of Gaussian-distributed errors, we can estimate this likelihood.
+
+During training, we typically **maximize the likelihood** to make the observed data as probable as possible under our model. Since likelihood is a product, it's complex to maximize directly. Taking the logarithm simplifies this: the log-likelihood becomes a sum of squared errors (the Ordinary Least Squares problem).
+
+## Logistic Regression
+
+### Binary Classification
+
+The **sigmoid function** maps any real-valued number to the range $(0, 1)$:
+
 $$
 \sigma(x) = \frac{1}{1 + e^{-x}}
 $$
 
-We have the likelihood as:
-The likelihood is:
+For binary classification with labels $y_i \in \{0, 1\}$, the likelihood is:
 
 $$
 L(w, b) = \prod_{i=1}^n 
@@ -31,76 +41,98 @@ L(w, b) = \prod_{i=1}^n
 \big[ 1 - \sigma(z_i) \big]^{1 - y_i}
 $$
 
+where $z_i = w^T x_i + b$ is the logit for sample $i$.
+
 The log-likelihood simplifies to:
 
 $$
 \ell(w, b) = \sum_{i=1}^n \left[ y_i \log \sigma(z_i) + (1 - y_i) \log \big(1 - \sigma(z_i)\big) \right]
 $$
 
-In pytorch, we can use **BCELoss**. You need to apply the **sigmoid** before using BCELoss
+**PyTorch Implementation:**
 
-BCEWithLogitLoss is more stable numerically than BCELoss + sigmoid.
-They use the log-sum trick.
-In sigmoid, there's an exponential. With big numbers or small numbers, it can lead to issues.
+- **`BCELoss`**: Binary Cross-Entropy Loss. Requires that you apply sigmoid to your model outputs first.
+- **`BCEWithLogitsLoss`**: Combines sigmoid and BCE loss for better numerical stability. This is the **recommended approach** as it uses the log-sum-exp trick internally to avoid numerical issues with very large or very small values in the exponential function.
 
-### softmax regression
+### Softmax Regression (Multi-class Classification)
 
-Now we have more than 2 classes
+For multi-class classification with $K > 2$ classes:
 
-- Model output: Logits (real-valued scores)
-- Probability model: Categorical distribution via softmax
-- Loss function Negative: log likelihood (cross-entropy)
+- **Model output**: Logits (real-valued scores)
+- **Probability model**: Categorical distribution via softmax
+- **Loss function**: Negative log-likelihood (cross-entropy)
 
-Softmax function: 
+The **softmax function** converts logits into a probability distribution:
+
 $$
 \text{softmax}(x_i) = \frac{e^{x_i}}{\sum_{j=1}^K e^{x_j}}
 $$
 
-At the of network: LogSoftmax
-Then use NLLLoss (negative log likelihood)
+**PyTorch Implementation:**
+
+- Apply `LogSoftmax` at the end of your network, then use `NLLLoss` (Negative Log Likelihood)
+- Alternatively, use `CrossEntropyLoss` directly on logits (it combines `LogSoftmax` + `NLLLoss`)
 
 ## Code examples
 
 ### Sigmoid + BCELoss = BCEWithLogitsLoss
+
 ```python
 import torch
 import torch.nn as nn
+
 m = nn.Sigmoid()
 loss = nn.BCELoss()
-loss_WithLogitsLoss = nn.BCEWithLogitsLoss()
+loss_with_logits = nn.BCEWithLogitsLoss()
 
-input = torch.randn(3,4,5)
-target = torch.rand(3,4,5)
+input = torch.randn(3, 4, 5)
+target = torch.rand(3, 4, 5)
 
-# using sigmoid + BCELoss is the same as BCEWithLogitsLoss
-loss(m(input), target) == loss_WithLogitsLoss(input, target)
+# Using Sigmoid + BCELoss is equivalent to BCEWithLogitsLoss
+result1 = loss(m(input), target)
+result2 = loss_with_logits(input, target)
+
+print(f"Sigmoid + BCELoss: {result1.item():.6f}")
+print(f"BCEWithLogitsLoss: {result2.item():.6f}")
+print(f"Are they equal? {torch.allclose(result1, result2)}")
 ```
 
-### NLLLoss + LogSoftMax = CrossEntropyLoss
+### NLLLoss + LogSoftmax = CrossEntropyLoss
+
 ```python
 import torch
 import torch.nn as nn
-m = nn.LogSoftmax(dim=1)
-loss1 = nn.NLLLoss()
-loss2 = nn.CrossEntropyLoss()
-C = 8
-input = torch.randn(3,C,4,5)
-target = torch.empty(3,4,5, dtype=torch.long).random_(0,C) 
 
-# using NLLL + logsoftmax is the same as CrossEntropyLoss
-assert loss1(m(input),target) == loss2(input,target)
+m = nn.LogSoftmax(dim=1)
+loss_nll = nn.NLLLoss()
+loss_ce = nn.CrossEntropyLoss()
+
+C = 8  # number of classes
+input = torch.randn(3, C, 4, 5)
+target = torch.empty(3, 4, 5, dtype=torch.long).random_(0, C)
+
+# NLLLoss + LogSoftmax is equivalent to CrossEntropyLoss
+result1 = loss_nll(m(input), target)
+result2 = loss_ce(input, target)
+
+print(f"NLLLoss + LogSoftmax: {result1.item():.6f}")
+print(f"CrossEntropyLoss: {result2.item():.6f}")
+print(f"Are they equal? {torch.allclose(result1, result2)}")
 ```
 
-If your model outputs raw logits, you should use CrossEntropyLoss directly.
+**Important**: 
+- If your model outputs **raw logits**, use `CrossEntropyLoss` directly.
+- If you already apply `LogSoftmax` in your model, use `NLLLoss` instead. Using `CrossEntropyLoss` would apply log-softmax twice and break training.
 
-If you already apply a LogSoftmax in your model, then you must use NLLLoss instead, or you’ll “double log-softmax” and break training.
+### NLLLoss (Negative Log-Likelihood Loss)
 
-### NLLLoss
+NLLLoss expects log-probabilities as input and computes the negative log-likelihood by selecting the log-probability of the true class.
 
 ```python
 import torch
+import torch.nn as nn
 
-# Fake "log probabilities" for a batch of 3 samples and 4 classes
+# Log probabilities for a batch of 3 samples and 4 classes
 log_probs = torch.tensor([
     [-0.5, -1.2, -2.0, -3.0],   # sample 1
     [-1.0, -0.2, -3.0, -2.0],   # sample 2
@@ -113,119 +145,130 @@ targets = torch.tensor([3, 1, 2])  # ground truth class indices
 picked = log_probs[torch.arange(len(targets)), targets]
 
 print("Picked log-probs:", picked)
-# >> Picked log-probs: tensor([-3.0000, -0.2000, -0.1000])
+# Picked log-probs: tensor([-3.0000, -0.2000, -0.1000])
 
 # NLL = -mean(correct log-probabilities)
-nll_loss = -picked.mean()
+nll_manual = -picked.mean()
+nll_builtin = nn.NLLLoss()(log_probs, targets)
 
-print("Manual NLLLoss:", nll_loss.item())
-# >> Manual NLLLoss: 1.100000023841858
+print(f"Manual NLLLoss: {nll_manual.item():.6f}")
+print(f"Built-in NLLLoss: {nll_builtin.item():.6f}")
+# Manual NLLLoss: 1.100000
 ```
 
-### Softmax
+### Softmax Implementation
+
+The softmax function converts logits into probabilities that sum to 1.
 
 ```python
+import torch
+import torch.nn as nn
+
 m = nn.Softmax(dim=1)
-input = torch.randn(2, 3)
+input = torch.tensor([[-0.2869,  0.8709, -1.0575],
+                       [-0.6224,  0.5318, -2.3918]])
 
-# >>> input
-# tensor([[-0.2869,  0.8709, -1.0575],
-#         [-0.6224,  0.5318, -2.3918]])
+print("Input logits:")
+print(input)
 
-output = m(input)
+# Built-in softmax
+output_builtin = m(input)
 
-# >> output
+print("\nBuilt-in Softmax:")
+print(output_builtin)
 # tensor([[0.2153, 0.6851, 0.0996],
 #         [0.2303, 0.7304, 0.0393]])
 
-```
-
-```python
+# Manual implementation
 exp_vals = torch.exp(input)
-
-# >>> exp_vals
-# tensor([[0.7506, 2.3891, 0.3473],
-#         [0.5366, 1.7020, 0.0915]])
-
 sum_exp = torch.sum(exp_vals, dim=1, keepdim=True)
+output_manual = exp_vals / sum_exp
 
-# >>> sum_exp
-# tensor([[3.4870],
-#         [2.3301]])
+print("\nManual Softmax:")
+print(output_manual)
 
-out_manual = exp_vals / sum_exp 
-
-# >> out_manual
-# tensor([[0.2153, 0.6851, 0.0996],
-#         [0.2303, 0.7304, 0.0393]])
+print(f"\nAre they equal? {torch.allclose(output_builtin, output_manual)}")
+print(f"Row sums (should be ~1.0): {output_manual.sum(dim=1)}")
 ```
 
-### Sigmoid
+### Sigmoid Implementation
+
+The sigmoid function $\sigma(x) = \frac{1}{1 + e^{-x}}$ squashes input values to the range $(0, 1)$.
 
 ```python
 import torch
 
-x = torch.tensor([-2.0, -1.0, 0.0, 1.0, 2.0])  # some test values
+x = torch.tensor([-2.0, -1.0, 0.0, 1.0, 2.0])
 
-# Built-in
+# Built-in sigmoid
 sig_builtin = torch.sigmoid(x)
 
-# Manual
+# Manual implementation
 sig_manual = 1 / (1 + torch.exp(-x))
 
 print("Input:", x)
-# Input: tensor([-2., -1.,  0.,  1.,  2.])
-
 print("Built-in Sigmoid:", sig_builtin)
-# Built-in Sigmoid: tensor([0.1192, 0.2689, 0.5000, 0.7311, 0.8808])
-
 print("Manual Sigmoid:", sig_manual)
+print(f"Max difference: {(sig_builtin - sig_manual).abs().max().item():.10f}")
+
+# Output:
+# Input: tensor([-2., -1.,  0.,  1.,  2.])
+# Built-in Sigmoid: tensor([0.1192, 0.2689, 0.5000, 0.7311, 0.8808])
 # Manual Sigmoid: tensor([0.1192, 0.2689, 0.5000, 0.7311, 0.8808])
-
-print("Difference:", (sig_builtin - sig_manual).abs().max().item())
-# Difference: 0.0
-
+# Max difference: 0.0000000000
 ```
 
-### BCELoss
+### BCELoss (Binary Cross-Entropy Loss)
 
-In the formula, when:
-- **target is 1**: we want the x in log(x) to be close to 1 (`log(1) = 0`).
-- **target is 0**: we want x in log(1-x) to be close to 0 (`log(1-0) = 0`)
+BCE Loss formula: $\text{BCE} = -\frac{1}{n}\sum_{i=1}^n [y_i \log(p_i) + (1-y_i) \log(1-p_i)]$
 
-
-```python-repl
->>> import torch
->>> import torch.nn as nn
->>> 
->>> # Fake logits (raw model outputs)
->>> logits = torch.tensor([[0.2], [-1.0], [2.0]])
->>> 
->>> # Targets (binary labels in [0,1])
->>> targets = torch.tensor([[1.0], [0.0], [1.0]])
->>> 
->>> # ---- Built-in way ----
->>> bce = nn.BCELoss()
->>> preds = torch.sigmoid(logits)  # must apply sigmoid first
->>> loss_builtin = bce(preds, targets)
->>> 
->>> # ---- Manual BCE ----
->>> preds_manual = 1 / (1 + torch.exp(-logits))  # sigmoid
->>> eps = 1e-12  # to avoid log(0)
->>> loss_manual = - (targets * torch.log(preds_manual + eps) +
-...                  (1 - targets) * torch.log(1 - preds_manual + eps)).mean()
->>> 
->>> print("Built-in BCE:", loss_builtin.item())
-Built-in BCE: 0.346109539270401
->>> print("Manual BCE:", loss_manual.item())
-Manual BCE: 0.346109539270401
-```
-
-
-### CrossEntropyLoss
+Intuition:
+- When **target is 1**: We want $p$ (prediction) close to 1, so $\log(p) \approx \log(1) = 0$ (minimal loss)
+- When **target is 0**: We want $p$ close to 0, so $\log(1-p) \approx \log(1) = 0$ (minimal loss)
 
 ```python
 import torch
+import torch.nn as nn
+
+# Logits (raw model outputs)
+logits = torch.tensor([[0.2], [-1.0], [2.0]])
+
+# Targets (binary labels in [0,1])
+targets = torch.tensor([[1.0], [0.0], [1.0]])
+
+# ---- Built-in way ----
+bce = nn.BCELoss()
+preds = torch.sigmoid(logits)  # must apply sigmoid first
+loss_builtin = bce(preds, targets)
+
+# ---- Manual BCE ----
+preds_manual = 1 / (1 + torch.exp(-logits))  # sigmoid
+eps = 1e-12  # to avoid log(0)
+loss_manual = - (targets * torch.log(preds_manual + eps) +
+                 (1 - targets) * torch.log(1 - preds_manual + eps)).mean()
+
+print(f"Built-in BCE: {loss_builtin.item():.6f}")
+print(f"Manual BCE: {loss_manual.item():.6f}")
+
+# Output:
+# Built-in BCE: 0.346110
+# Manual BCE: 0.346110
+```
+
+
+### CrossEntropyLoss Implementation
+
+Cross-entropy loss combines log-softmax and negative log-likelihood. The formula is:
+
+$$
+\text{CE} = -\frac{1}{n}\sum_{i=1}^n \log\left(\frac{e^{z_{i,y_i}}}{\sum_{j=1}^K e^{z_{i,j}}}\right)
+$$
+
+where $z_{i,y_i}$ is the logit for the true class of sample $i$.
+
+```python
+import torch
+import torch.nn as nn
 
 # Example logits (batch=3, classes=4)
 logits = torch.tensor([
@@ -236,33 +279,35 @@ logits = torch.tensor([
 
 targets = torch.tensor([3, 0, 2])  # true class indices
 
-# ---- Step 1: stability trick: subtract max per row ----
+# ---- Step 1: Numerical stability trick (subtract max per row) ----
 max_logits, _ = torch.max(logits, dim=1, keepdim=True)
 logits_shifted = logits - max_logits
 
-# ---- Step 2: compute log-sum-exp ----
+# ---- Step 2: Compute log-sum-exp ----
 sum_exp = torch.sum(torch.exp(logits_shifted), dim=1, keepdim=True)
 log_sum_exp = torch.log(sum_exp)
 
-# ---- Step 3: pick the logits of the true classes ----
+# ---- Step 3: Pick the logits of the true classes ----
 true_class_logits = logits_shifted[torch.arange(len(targets)), targets]
 
-# ---- Step 4: compute CrossEntropyLoss ----
-ce_manual = - (true_class_logits - log_sum_exp.squeeze()).mean()
+# ---- Step 4: Compute CrossEntropyLoss ----
+ce_manual = -(true_class_logits - log_sum_exp.squeeze()).mean()
 
-print("Manual CrossEntropyLoss:", ce_manual.item())
-
-# ---- Optional: check against built-in ----
-import torch.nn as nn
+# ---- Compare with built-in ----
 ce_builtin = nn.CrossEntropyLoss()(logits, targets)
-print("Built-in CrossEntropyLoss:", ce_builtin.item())
 
+print(f"Manual CrossEntropyLoss: {ce_manual.item():.6f}")
+print(f"Built-in CrossEntropyLoss: {ce_builtin.item():.6f}")
+print(f"Are they equal? {torch.allclose(ce_manual, ce_builtin)}")
 ```
 
-Exercise - implement it!
+### Exercise: Implement CrossEntropyLoss
+
+Try implementing cross-entropy loss yourself:
 
 ```python
 import torch
+import torch.nn as nn
 
 # Example logits (batch=3, classes=4)
 logits = torch.tensor([
@@ -273,15 +318,18 @@ logits = torch.tensor([
 
 targets = torch.tensor([3, 0, 2])  # true class indices
 
+# TODO: Implement ce_manual
 # ce_manual = ?
 
-# ce_built_in = ?
+# TODO: Compare with built-in
+# ce_builtin = nn.CrossEntropyLoss()(logits, targets)
 ```
 
-My first try:
+**My first attempt:**
 
 ```python
 import torch
+import torch.nn as nn
 
 # Example logits (batch=3, classes=4)
 logits = torch.tensor([
@@ -292,47 +340,79 @@ logits = torch.tensor([
 
 targets = torch.tensor([3, 0, 2])  # true class indices
 
+# Compute softmax manually
 logits_exp = torch.exp(logits)
-
 logits_exp_sum = logits_exp.sum(dim=1, keepdim=True)
+probs = logits_exp / logits_exp_sum
 
-my_logits = logits_exp / logits_exp_sum
+# Compute cross-entropy
+ce_manual = -torch.log(probs[torch.arange(len(targets)), targets]).mean()
+ce_builtin = nn.CrossEntropyLoss()(logits, targets)
 
-loss = - (torch.log(my_logits[torch.arange(len(targets)), targets]).mean()).item()
-
-# ce_manual = ?
-print(loss)
-
-# ce_built_in = ?
-print(nn.CrossEntropyLoss()(logits, targets))
-
+print(f"Manual implementation: {ce_manual.item():.6f}")
+print(f"Built-in implementation: {ce_builtin.item():.6f}")
 ```
 
-With this implementation, I am not using the trick used in the 1st implementation. When I do `log(logits_exp / logits_exp_sum)` I could avoid computing some computations.
-Indeed, `log(a/b) = log(a) - log(b)` and here, `a=exp(x)` so when using `log(exp(a))`, we should not do any computation.
+**Note on optimization**: This implementation doesn't use the numerical stability trick from the previous example. When computing $\log(\frac{\exp(x)}{\sum \exp(x)})$, we can simplify using logarithm properties:
+
+$$
+\log\left(\frac{a}{b}\right) = \log(a) - \log(b)
+$$
+
+Since $a = e^x$, we have $\log(e^x) = x$, which avoids computing the exponential and logarithm. This is more efficient and numerically stable.
 
 
-### log-sum-exp trick
+### Log-Sum-Exp Trick
 
-The **log-sum-exp trick** is used to compute:
+The **log-sum-exp trick** is crucial for numerical stability when computing:
 
+$$
+\log \sum_i e^{x_i}
+$$
+
+Direct computation can overflow when $x_i$ values are large. The trick subtracts the maximum value:
 
 $$
 \log \sum_i e^{x_i} = \log \sum_i e^{x_i - m} \cdot e^m = m + \log \sum_i e^{x_i - m}
 $$
 
-
-This avoids overflow when some `x_i` are very large.
-
+where $m = \max_i x_i$. This keeps all exponentials in a reasonable range.
 
 ```python
 import torch
 
 x = torch.tensor([1000.0, 1001.0, 1002.0])
 
-torch.log(torch.exp(x).sum())
-# >>> tensor(inf)
+# Naive approach - causes overflow!
+naive = torch.log(torch.exp(x).sum())
+print(f"Naive computation: {naive}")
+# Output: tensor(inf)
 
+# Stable approach using log-sum-exp trick
+m = x.max()
 safe = m + torch.log(torch.exp(x - m).sum())
-# >>> tensor(1002.4076)
+print(f"Stable computation: {safe:.4f}")
+# Output: tensor(1002.4076)
+
+# PyTorch has a built-in function for this
+builtin = torch.logsumexp(x, dim=0)
+print(f"Built-in logsumexp: {builtin:.4f}")
+# Output: tensor(1002.4076)
+```
+
+## Summary
+
+| Loss Function | Use Case | PyTorch Class | Input Requirements |
+|---------------|----------|---------------|--------------------| 
+| BCELoss | Binary classification | `nn.BCELoss()` | Probabilities (after sigmoid) |
+| BCEWithLogitsLoss | Binary classification | `nn.BCEWithLogitsLoss()` | Raw logits (more stable) |
+| NLLLoss | Multi-class classification | `nn.NLLLoss()` | Log-probabilities (after LogSoftmax) |
+| CrossEntropyLoss | Multi-class classification | `nn.CrossEntropyLoss()` | Raw logits (recommended) |
+
+**Key Takeaways:**
+
+1. Always use the numerically stable versions: `BCEWithLogitsLoss` and `CrossEntropyLoss`
+2. Don't apply activation functions before loss functions that expect raw logits
+3. The log-sum-exp trick prevents overflow in softmax computations
+4. Cross-entropy loss is equivalent to negative log-likelihood with softmax probabilities
 
