@@ -1,4 +1,4 @@
-# The value of initialization
+# The value of initialization 📐🧠
 
 I started reading [The Little Book of Deep Learning by Francois Fleuret](https://fleuret.org/francois/lbdl.html)
 

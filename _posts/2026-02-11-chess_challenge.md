@@ -1,4 +1,4 @@
-# Can a Bee-Sized Brain Play Chess? Training a 1M Parameter Chess Engine
+# Can a Bee-Sized Brain Play Chess? Training a 1M Parameter Chess Engine ♟️🐝
 
 *An investigation into how a honey bee-sized neural network learns to play chess through next-token prediction*
 
