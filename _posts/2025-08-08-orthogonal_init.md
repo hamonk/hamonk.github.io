@@ -1,17 +1,21 @@
 # The value of initialization 📐🧠
 
-I started reading [The Little Book of Deep Learning by Francois Fleuret](https://fleuret.org/francois/lbdl.html)
+I started reading [The Little Book of Deep Learning by François Fleuret](https://fleuret.org/francois/lbdl.html).
 
-One of the first examples is about classifying data that looks like the yin and yang.
+One of the first examples poses a simple-looking classification problem: given a set of 2D points, predict whether each point is red or blue. The two classes curve around each other like a yin-yang symbol:
 
 ![task](/images/original.png)
 
+Because the classes are interleaved, a straight line cannot separate them in the original input space. A neural network can instead transform the points into a new representation where a final linear layer can distinguish the two classes.
+
+The interesting question is whether a very narrow network—with just two units in each hidden layer—can learn that transformation, and how its weight initialization affects the result.
+
 ## First results
 
-I set up my deep neural network as explained in the book: 
-- 8 layers of size 2×2
-- tanh activation applied component-wise
-- a final classification layer
+I set up the network described in the book:
+- 8 hidden layers, each with 2 units
+- `tanh` activation applied component-wise
+- a final linear layer that produces scores for the 2 classes
 
 ```python
 # Define the custom MLP model with 8 layers and final linear classifier
@@ -35,10 +39,9 @@ class DeepTanhMLP(nn.Module):
         return x.detach().numpy()
 ```
 
-I expected this small problem to be solved with 100% accuracy pretty quickly.
+Although the network is deep, it is very narrow. I expected it to solve this small problem and reach 100% accuracy quickly.
 
-It didn’t happen.
-The loss decreased, but accuracy plateaued far below perfection:
+That didn’t happen. The loss decreased, but accuracy plateaued well below 100%:
 
 ![loss](/images/loss_no_init.png)
 
@@ -46,42 +49,42 @@ The loss decreased, but accuracy plateaued far below perfection:
 
 I started troubleshooting:
 
-- **Vanishing gradients?** — Yes, gradients became tiny after just a few iterations.
-- **Data normalization?** — Initially missing, and while it caused other issues, it wasn’t the main culprit here.
-- **Training loop?** / optimizer / learning rate / batch size? — Unlikely. When I switched to a larger model (e.g., 1 hidden layer of size 8), training worked fine.
-- **Random chance?** — Sometimes the model did reach 100% accuracy, but inconsistently.
+- **Vanishing gradients?** — Yes. Gradients became tiny after only a few iterations.
+- **Data normalization?** — I initially skipped it. That caused other issues, but did not seem to be the main culprit here.
+- **Training loop, optimizer, learning rate, or batch size?** — These seemed less likely: a larger, shallower model (one hidden layer with 8 units) trained successfully.
+- **Random chance?** — Sometimes the narrow model did reach 100% accuracy, but not reliably.
 
-What really stood out: after a few layers, the data collapsed onto a single line:
+One thing stood out: after a few layers, the transformed data collapsed onto nearly a single line:
 
 ![bad learning](/images/layers_output_no_init.png)
 
-Thanks to the grey crosses on the plot, we can see that the entire input space is compressed onto a single line, losing its original 2D structure.
+The grey crosses show the input space being compressed along one direction. The network is losing much of the data’s original 2D structure, making it harder for later layers to separate the classes.
 
 ## Orthogonal Initialization
 
-I experimented with initialization methods. Xavier didn’t help much. (see [Glorot Initialization](https://en.wikipedia.org/wiki/Weight_initialization#Glorot_initialization))
+I experimented with different initialization methods. Xavier initialization did not help much (see [Glorot Initialization](https://en.wikipedia.org/wiki/Weight_initialization#Glorot_initialization)).
 
-The breakthrough came with orthogonal initialization. As soon as I applied it, the network became much more reliable and reached 100% accuracy consistently.
+The breakthrough came with orthogonal initialization. With it, training became much more reliable, and the network reached 100% accuracy consistently in my runs.
 
 ![good loss](/images/loss_with_init.png)
 
-We can see the different transformation of the space are clearly separating the blue / red data making it easy for the final layer to discriminate between the two.
+The layers now transform the space in a way that separates the blue and red points, making them easier for the final layer to distinguish.
 
-Visualization showing the effect of the layers on the data:
+Here is the effect of the layers on the data:
 
 ![good learning](/images/layers_output_orthogonal_init.png)
 
-Orthogonal initialization sets the weight matrix so its rows (or columns) are orthogonal vectors.
+Orthogonal initialization sets a weight matrix so its rows or columns are orthogonal.
 
-**Key property:** Orthogonal matrices preserve variance. This helps keep activations and gradients from exploding or vanishing, even across many layers.
+This can help preserve the scale of signals and gradients as they pass through a network. It is not a guarantee against vanishing or exploding gradients—nonlinearities such as `tanh`, as well as training updates, still affect the values.
 
-By preserving the spread of the data in early layers, the network keeps more useful information for the later ones — which is exactly what fixed my yin–yang classification problem.
+In this experiment, the initialized layers kept more of the data’s spread, giving later layers useful information to work with. That made this narrow network much better at learning the transformation needed for the yin-yang classification problem.
 
 ## SVD = Singular Value Decomposition
 
-One way to check if matrices are problematic is by using `torch.linalg.svd`.
+Singular value decomposition (SVD) gives another way to inspect how a weight matrix scales different directions. In PyTorch, we can compute it with `torch.linalg.svd`.
 
-Here are the values I get:
+Here are the values from the model weights I inspected:
 ```python
 # RANDOM INITIALIZATION
 
@@ -114,9 +117,9 @@ Layer 6 singular values: tensor([1.8517, 0.8446])
 Layer 7 singular values: tensor([2.1327, 0.8531])
 ```
 
-If `s[1]` is very small compared to `s[0]`, then `W` is nearly rank 1.
+These are values from the weights in my runs, not the untouched initialization. In particular, orthogonally initialized square matrices start with singular values of 1, but training can change them.
 
-We can see that for Layer 1 with random initialization, `s[1]` is 0.0936 << 0.9710 (`s[0]`).
+If `s[1]` is very small compared to `s[0]`, then `W` strongly compresses one direction and is close to rank 1. In the randomly initialized model, Layer 1 has singular values 0.9710 and 0.0936—a large difference that is consistent with the collapse seen in the visualization. This is a useful clue, though the behavior of the full network also depends on its other layers and nonlinearities.
 
 ## Code
 
