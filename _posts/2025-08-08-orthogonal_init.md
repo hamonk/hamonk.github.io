@@ -86,6 +86,10 @@ Singular value decomposition (SVD) is one way to investigate how a layer’s wei
 
 I’ve left the per-layer SVD outputs and code in the [notebook](https://github.com/hamonk/deep-learning/blob/main/the_value_of_initialization/the_value_of_initialization.ipynb) for anyone who wants to dig into the details.
 
+## Conclusion
+
+I find it fascinating that we can visualize and interpret what happens inside a neural network and understand why learning sometimes fails!
+
 ## Code
 
 The full code can be found [here](https://github.com/hamonk/deep-learning/blob/main/the_value_of_initialization/the_value_of_initialization.ipynb)
