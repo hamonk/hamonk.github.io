@@ -1,8 +1,6 @@
 # The value of initialization 📐🧠
 
-I started reading [The Little Book of Deep Learning by François Fleuret](https://fleuret.org/francois/lbdl.html).
-
-One of the first examples poses a simple-looking classification problem: given a set of 2D points, predict whether each point is red or blue. The two classes curve around each other like a yin-yang symbol:
+In [The Little Book of Deep Learning by François Fleuret](https://fleuret.org/francois/lbdl.html), one of the first examples poses a simple-looking classification problem: given a set of 2D points, predict whether each point is red or blue. The two classes curve around each other like a yin-yang symbol:
 
 ![task](/images/original.png)
 
@@ -82,44 +80,9 @@ In this experiment, the initialized layers kept more of the data’s spread, giv
 
 ## SVD = Singular Value Decomposition
 
-Singular value decomposition (SVD) gives another way to inspect how a weight matrix scales different directions. In PyTorch, we can compute it with `torch.linalg.svd`.
+Singular value decomposition (SVD) is one way to investigate how a layer’s weight matrix stretches or compresses different directions. Singular values measure the amount of stretching or shrinking along those directions. For example, in one of my randomly initialized models, Layer 1 had singular values 0.9710 and 0.0936. The smaller value indicates that this layer strongly compresses one direction, which is consistent with the collapse in the visualization.
 
-Here are the values from the model weights I inspected:
-```python
-# RANDOM INITIALIZATION
-
-for x in range(8):
-    u, s, v = torch.linalg.svd(model.layers[x].weight.detach())
-    print(f"Layer {x} singular values: {s}")
-
-Layer 0 singular values: tensor([0.9221, 0.4884])
-Layer 1 singular values: tensor([0.9710, 0.0936]) <- problematic
-Layer 2 singular values: tensor([0.6273, 0.1235])
-Layer 3 singular values: tensor([0.4757, 0.1770])
-Layer 4 singular values: tensor([0.7705, 0.2222])
-Layer 5 singular values: tensor([0.9553, 0.4274])
-Layer 6 singular values: tensor([0.6217, 0.1350])
-Layer 7 singular values: tensor([0.7096, 0.5015])
-
-# ORTHOGONAL INITIALIZATION
-
-for x in range(8):
-    u, s, v = torch.linalg.svd(model_with_initialization.layers[x].weight.detach())
-    print(f"Layer {x} singular values: {s}")
-
-Layer 0 singular values: tensor([1.7645, 0.2109])
-Layer 1 singular values: tensor([1.5999, 1.0709])
-Layer 2 singular values: tensor([1.4989, 0.8290])
-Layer 3 singular values: tensor([1.5814, 0.5803])
-Layer 4 singular values: tensor([1.6148, 0.7659])
-Layer 5 singular values: tensor([1.6656, 0.8657])
-Layer 6 singular values: tensor([1.8517, 0.8446])
-Layer 7 singular values: tensor([2.1327, 0.8531])
-```
-
-These are values from the weights in my runs, not the untouched initialization. In particular, orthogonally initialized square matrices start with singular values of 1, but training can change them.
-
-If `s[1]` is very small compared to `s[0]`, then `W` strongly compresses one direction and is close to rank 1. In the randomly initialized model, Layer 1 has singular values 0.9710 and 0.0936—a large difference that is consistent with the collapse seen in the visualization. This is a useful clue, though the behavior of the full network also depends on its other layers and nonlinearities.
+This is a diagnostic clue, not proof that one layer alone caused the problem: the network’s behavior also depends on its other layers and nonlinearities. I’ve left the per-layer SVD outputs and code in the [notebook](https://github.com/hamonk/deep-learning/blob/main/the_value_of_initialization/the_value_of_initialization.ipynb) for anyone who wants to dig into the details.
 
 ## Code
 
