@@ -1,5 +1,7 @@
 # The value of initialization 📐🧠
 
+A network with just two neurons per hidden layer kept collapsing before it could classify a simple yin-yang dataset. Switching to orthogonal initialization changed the outcome: it reached 100% accuracy in every training run. Here’s what the layer visualizations—and a look at the weights’ singular values—revealed.
+
 In [The Little Book of Deep Learning by François Fleuret](https://fleuret.org/francois/lbdl.html), one of the first examples poses a simple-looking classification problem: given a set of 2D points, predict whether each point is red or blue. The two classes curve around each other like a yin-yang symbol:
 
 ![task](/images/original.png)
@@ -82,7 +84,7 @@ In this experiment, the initialized layers kept more of the data’s spread, giv
 
 Singular value decomposition (SVD) is one way to investigate how a layer’s weight matrix stretches or compresses different directions. Singular values measure the amount of stretching or shrinking along those directions. For example, in one of my randomly initialized models, Layer 1 had singular values 0.9710 and 0.0936. The smaller value indicates that this layer strongly compresses one direction, which is consistent with the collapse in the visualization.
 
-This is a diagnostic clue, not proof that one layer alone caused the problem: the network’s behavior also depends on its other layers and nonlinearities. I’ve left the per-layer SVD outputs and code in the [notebook](https://github.com/hamonk/deep-learning/blob/main/the_value_of_initialization/the_value_of_initialization.ipynb) for anyone who wants to dig into the details.
+I’ve left the per-layer SVD outputs and code in the [notebook](https://github.com/hamonk/deep-learning/blob/main/the_value_of_initialization/the_value_of_initialization.ipynb) for anyone who wants to dig into the details.
 
 ## Code
 
