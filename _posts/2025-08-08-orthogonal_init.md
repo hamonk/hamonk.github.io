@@ -74,9 +74,7 @@ Here is the effect of the layers on the data:
 
 ![good learning](/images/layers_output_orthogonal_init.png)
 
-Orthogonal initialization sets a weight matrix so its rows or columns are orthogonal.
-
-This can help preserve the scale of signals and gradients as they pass through a network. It is not a guarantee against vanishing or exploding gradients—nonlinearities such as `tanh`, as well as training updates, still affect the values.
+Orthogonal initialization sets a weight matrix so its rows or columns are orthogonal. It helps preserve the scale of signals as they pass through the network, which can make training more stable and reliable.
 
 In this experiment, the initialized layers kept more of the data’s spread, giving later layers useful information to work with. That made this narrow network much better at learning the transformation needed for the yin-yang classification problem.
 
@@ -88,7 +86,7 @@ I’ve left the per-layer SVD outputs and code in the [notebook](https://github.
 
 ## Conclusion
 
-I find it fascinating that we can visualize and interpret what happens inside a neural network and understand why learning sometimes fails!
+I find setting up machine learning experiments and figuring out how to tell whether learning is actually happening fascinating. Being able to visualize the 2D network and how it transforms the data space makes it even more interesting!
 
 ## Code
 
