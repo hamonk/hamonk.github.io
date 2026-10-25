@@ -1,7 +1,5 @@
 # The value of initialization 📐🧠
 
-A network with just two neurons per hidden layer kept collapsing before it could classify a simple yin-yang dataset. Switching to orthogonal initialization changed the outcome: it reached 100% accuracy in every training run. Here’s what the layer visualizations—and a look at the weights’ singular values—revealed.
-
 In [The Little Book of Deep Learning by François Fleuret](https://fleuret.org/francois/lbdl.html), one of the first examples poses a simple-looking classification problem: given a set of 2D points, predict whether each point is red or blue. The two classes curve around each other like a yin-yang symbol:
 
 ![task](/images/original.png)
