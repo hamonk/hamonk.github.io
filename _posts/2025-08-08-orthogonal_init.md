@@ -6,7 +6,9 @@ In [The Little Book of Deep Learning by François Fleuret](https://fleuret.org/f
 
 Because the classes are interleaved, a straight line cannot separate them in the original input space. A neural network can instead transform the points into a new representation where a final linear layer can distinguish the two classes.
 
-The interesting question is whether a very narrow network—with just two units in each hidden layer—can learn that transformation, and how its weight initialization affects the result.
+I was intrigued by this example. Training a small neural network to solve such a simple problem seemed straightforward, so I set up an experiment. However, my initial results were not what I expected.
+
+In this post, I walk through the experiments that led me to identify weight initialization as the culprit. Because the problem is two-dimensional, we can visualize the network's behavior at each stage, making it easier to see what went wrong and how the initialization affected the learning process.
 
 ## First results
 
